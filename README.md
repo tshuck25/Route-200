@@ -2,6 +2,7 @@ Route 200: Budget Trip Planner
 Route 200 is a full-stack travel management application designed to bridge the gap between inspiration and itemized planning. It allows users to discover destinations, track expenses, and manage itineraries within a strict budget.
 
 🛠 Project Progress (Current Status)
+=======
 1. Architecture & Infrastructure
 Dockerized Environment: Successfully containerized the application using Docker Compose, separating the Django (REST Framework) backend, React (Vite) frontend, and PostgreSQL database.
 
@@ -69,3 +70,5 @@ docker-compose exec backend python manage.py migrate
 # Create Superuser (to access /admin)
 docker-compose exec backend python manage.py createsuperuser
 5. Accessing the AppFrontend: http://localhost:5173Backend API: http://localhost:8000/api/Django Admin: http://localhost:8000/admin/🛠 Troubleshooting & Common CommandsTaskCommandView Logsdocker-compose logs -fStop Appdocker-compose downRestart Backenddocker-compose restart backendEnter DB Shelldocker-compose exec db psql -U postgres🛡 Security NoteIMPORTANT: Never commit your .env file to GitHub. It is currently listed in the .gitignore to prevent leaking secret keys and database credentials.
+=======
+
