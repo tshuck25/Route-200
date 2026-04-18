@@ -1,6 +1,10 @@
 from django.contrib import admin
-from .models import Trip, Destination, Note
+from .models import Trip, Destination
 
-admin.site.register(Trip)
-admin.site.register(Destination)
-admin.site.register(Note)
+@admin.register(Trip)
+class TripAdmin(admin.ModelAdmin):
+    list_display = ('title', 'user', 'start_date', 'end_date')
+
+@admin.register(Destination)
+class DestinationAdmin(admin.ModelAdmin):
+    list_display = ('name', 'trip', 'is_featured', 'is_suggested')

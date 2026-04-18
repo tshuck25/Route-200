@@ -1,19 +1,14 @@
 from rest_framework import serializers
-from .models import Trip, Destination, Note
-
-class NoteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Note
-        fields = '__all__'
+from .models import Trip, Destination
 
 class DestinationSerializer(serializers.ModelSerializer):
-    notes = NoteSerializer(many=True, read_only=True)
     class Meta:
         model = Destination
-        fields = '__all__'
+        fields = ['id', 'name', 'description', 'is_featured', 'is_suggested', 'image_url']
 
 class TripSerializer(serializers.ModelSerializer):
     destinations = DestinationSerializer(many=True, read_only=True)
+    
     class Meta:
         model = Trip
-        fields = '__all__'
+        fields = ['id', 'title', 'start_date', 'end_date', 'budget', 'destinations']
