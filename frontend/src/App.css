@@ -1,0 +1,383 @@
+:root {
+  --bg: #f4f7fb;
+  --panel: #ffffff;
+  --panel-soft: rgba(255, 255, 255, 0.72);
+  --primary: #172554;
+  --primary-light: #2563eb;
+  --accent: #38bdf8;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: rgba(148, 163, 184, 0.28);
+  --danger: #dc2626;
+  --radius: 22px;
+  --shadow: 0 24px 70px rgba(15, 23, 42, 0.12);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.15), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.18), transparent 28%),
+    var(--bg);
+  color: var(--text);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  border: 0;
+  cursor: pointer;
+}
+
+input {
+  width: 100%;
+  border: 1px solid var(--border);
+  outline: none;
+}
+
+input:focus {
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.auth-card {
+  width: min(100%, 400px);
+  padding: 42px;
+  border-radius: 28px;
+  background: var(--panel-soft);
+  backdrop-filter: blur(18px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.auth-card h1 {
+  margin: 0;
+  color: var(--primary);
+  letter-spacing: -0.06em;
+  font-size: 2.5rem;
+}
+
+.auth-card p {
+  color: var(--muted);
+}
+
+.auth-card form {
+  display: grid;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.auth-card input {
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: white;
+}
+
+.auth-card button[type="submit"] {
+  padding: 14px 18px;
+  border-radius: 16px;
+  color: white;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.text-button {
+  margin-top: 18px;
+  background: transparent;
+  color: var(--primary-light);
+  font-weight: 700;
+}
+
+.message {
+  color: var(--danger) !important;
+  font-size: 0.9rem;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+}
+
+.sidebar {
+  min-height: 100vh;
+  padding: 22px 14px;
+  background: linear-gradient(180deg, #0f172a, #172554);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 12px 0 40px rgba(15, 23, 42, 0.22);
+  overflow: hidden;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.sidebar-logo img {
+  height: 75px;
+  width: auto;
+  display: block;
+}
+
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-nav {
+  display: grid;
+  gap: 10px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px;
+  border-radius: 16px;
+  background: transparent;
+  color: white;
+  font-weight: 800;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.sign-out {
+  margin-top: auto;
+  color: #fecaca;
+}
+
+.dashboard {
+  flex: 1;
+  min-width: 0;
+  padding: 34px;
+  overflow-y: auto;
+}
+
+.hero,
+.featured-card,
+.trip-card {
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.hero {
+  min-height: 180px;
+  padding: 34px;
+  border-radius: 32px;
+  color: white;
+  background:
+    linear-gradient(135deg, rgba(23, 37, 84, 0.95), rgba(37, 99, 235, 0.88)),
+    url("./assets/background2.png");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: end;
+}
+
+.hero h2,
+.featured-card h2 {
+  margin: 6px 0 0;
+  max-width: 680px;
+  font-size: clamp(2rem, 5vw, 4.25rem);
+  line-height: 0.95;
+  letter-spacing: -0.07em;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--accent);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+}
+
+.search-input {
+  margin: 28px 0;
+  padding: 18px 22px;
+  border-radius: 999px;
+  background: white;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+}
+
+.featured-card {
+  min-height: 240px;
+  padding: 32px;
+  border-radius: 32px;
+  color: white;
+  background:
+    linear-gradient(135deg, rgba(15, 23, 42, 0.3), rgba(37, 99, 235, 0.72)),
+    url("./assets/background.png");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: end;
+}
+
+section h2,
+section h3 {
+  letter-spacing: -0.04em;
+}
+
+.destination-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 22px;
+}
+
+.trip-card {
+  padding: 24px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(14px);
+}
+
+.trip-card h4 {
+  margin: 0 0 8px;
+  font-size: 1.2rem;
+  letter-spacing: -0.03em;
+}
+
+.trip-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.saved-list {
+  display: grid;
+  gap: 16px;
+}
+
+.empty-state {
+  padding: 24px;
+  border-radius: 20px;
+  background: white;
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+
+@media (max-width: 900px) {
+  .app-shell {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100% !important;
+    min-height: auto;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .sidebar-header {
+    flex-shrink: 0;
+  }
+
+  .sidebar-nav {
+    display: flex;
+    flex: 1;
+    overflow-x: auto;
+  }
+
+  .nav-item {
+    width: auto;
+  }
+
+  .sign-out {
+    margin-top: 0;
+  }
+
+  .dashboard {
+    padding: 20px;
+  }
+
+  .hero,
+  .featured-card {
+    min-height: 220px;
+    padding: 24px;
+  }
+}
+
+@media (max-width: 560px) {
+  .auth-card {
+    padding: 28px;
+  }
+
+  .sidebar-logo {
+    display: none;
+  }
+
+  .nav-item span {
+    display: none;
+  }
+
+  .dashboard {
+    padding: 14px;
+  }
+
+  .hero,
+  .featured-card {
+    border-radius: 24px;
+  }
+
+  .hero h2,
+  .featured-card h2 {
+    font-size: 2rem;
+  }
+
+  .destination-grid {
+    grid-template-columns: 1fr;
+  }
+}
