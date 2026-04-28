@@ -293,6 +293,48 @@ section h3 {
   line-height: 1.6;
 }
 
+.trip-form {
+  display: grid;
+  gap: 14px;
+  margin: 28px 0;
+  padding: 24px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+/* Make inputs match auth-card inputs */
+.trip-form input {
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: white;
+}
+
+/* Align date + number inputs visually */
+.trip-form input[type="date"],
+.trip-form input[type="number"] {
+  font-family: inherit;
+}
+
+/* Button matches your primary gradient style */
+.trip-form button {
+  margin-top: 6px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  color: white;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Optional hover polish */
+.trip-form button:hover {
+  opacity: 0.95;
+}
+
 .saved-list {
   display: grid;
   gap: 16px;
