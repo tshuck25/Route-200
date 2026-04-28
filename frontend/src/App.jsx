@@ -7,24 +7,39 @@ function App() {
   const [view, setView] = useState("home");
   const [isNavOpen, setIsNavOpen] = useState(true);
   const [isLoginView, setIsLoginView] = useState(true);
+
   const [trips, setTrips] = useState([]);
+  const [title, setTitle] = useState("");
+  const [destination, setDestination] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [budget, setBudget] = useState(0);
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
   const [token, setToken] = useState(localStorage.getItem("access_token"));
   const [message, setMessage] = useState("");
+
+  // ---------------- AUTH ----------------
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const endpoint = isLoginView ? "token/" : "signup/";
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/${endpoint}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/${endpoint}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        }
+      );
 
       const data = await response.json();
+
+      console.log("AUTH RESPONSE:", data);
 
       if (response.ok) {
         if (isLoginView) {
@@ -42,21 +57,65 @@ function App() {
     }
   };
 
+  // ---------------- FETCH TRIPS ----------------
+
   useEffect(() => {
     if (!token) return;
 
+    console.log("FETCHING TRIPS WITH TOKEN:", token);
+
     fetch(`${import.meta.env.VITE_API_URL}/api/trips/`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
       .then((res) => res.json())
-      .then((data) => setTrips(Array.isArray(data) ? data : []))
-      .catch(() => console.error("Failed to load trips."));
+      .then((data) => {
+        console.log("TRIPS RESPONSE:", data);
+        setTrips(Array.isArray(data) ? data : []);
+      })
+      .catch((err) => console.error("TRIPS ERROR:", err));
   }, [token]);
+
+  // ---------------- CREATE TRIP ----------------
+
+  const createTrip = async () => {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/trips/`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+        title,
+        destination,
+        budget,
+        start_date: startDate,
+        end_date: endDate,
+      }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+      setTrips((prev) => [...prev, data]);
+      setTitle("");
+      setDestination("");
+    }
+  };
+
+  // ---------------- LOGOUT ----------------
 
   const handleSignOut = () => {
     localStorage.clear();
     setToken(null);
+    setTrips([]);
   };
+
+  // ---------------- LOGIN SCREEN ----------------
 
   if (!token) {
     return (
@@ -68,7 +127,6 @@ function App() {
           transition={{ duration: 0.35 }}
         >
           <img src="/logo.png" alt="Route 200 logo" style={{ height: 125 }} />
-          
 
           <form onSubmit={handleSubmit}>
             <input
@@ -108,6 +166,8 @@ function App() {
     );
   }
 
+  // ---------------- MAIN APP ----------------
+
   return (
     <div className="app-shell">
       <Sidebar
@@ -128,28 +188,49 @@ function App() {
 
         <input className="search-input" placeholder="Search destinations..." />
 
+        {/* TEST BUTTON ALWAYS VISIBLE */}
+        <div className="trip-form">
+          <input
+            placeholder="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+
+          <input
+            placeholder="Destination"
+            value={destination}
+            onChange={(e) => setDestination(e.target.value)}
+          />
+
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+
+          <input
+            type="number"
+            value={budget}
+            onChange={(e) => setBudget(e.target.value)}
+          />
+
+          <button onClick={createTrip}>
+            Save Trip
+          </button>
+        </div>
+
         {view === "home" ? (
           <>
             <section className="featured-card">
               <div>
                 <p className="eyebrow">Featured Destination</p>
                 <h2>Explore affordable travel options</h2>
-              </div>
-            </section>
-
-            <section>
-              <h3>Suggested Destinations</h3>
-
-              <div className="destination-grid">
-                <motion.article whileHover={{ y: -6 }} className="trip-card">
-                  <h4>Paris, France</h4>
-                  <p>Culture, food, museums, and walkable neighborhoods.</p>
-                </motion.article>
-
-                <motion.article whileHover={{ y: -6 }} className="trip-card">
-                  <h4>Rome, Italy</h4>
-                  <p>Historic sites, local markets, and classic city routes.</p>
-                </motion.article>
               </div>
             </section>
           </>

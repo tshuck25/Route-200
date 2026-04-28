@@ -31,6 +31,6 @@ services:
     ports:
       - "5173:5173"
     environment:
-     - VITE_API_URL=http://3.144.125.30:8000
+     - VITE_API_URL=http://localhost:8000
 volumes:
   postgres_data:
