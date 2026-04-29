@@ -1,10 +1,12 @@
-import { Home, Star, LogOut, Menu, PanelLeftClose } from "lucide-react";
+import { Home, Star, LogOut, Menu, PanelLeftClose, DollarSign } from "lucide-react";
 import { motion } from "framer-motion";
 
 function Sidebar({ view, setView, isNavOpen, setIsNavOpen, onSignOut }) {
   const navItems = [
     { id: "home", label: "Home", icon: Home },
     { id: "saved", label: "Saved", icon: Star },
+    // LEAD 3: Added Expenses tab
+    { id: "expenses", label: "Expenses", icon: DollarSign },
   ];
 
   return (
@@ -15,7 +17,6 @@ function Sidebar({ view, setView, isNavOpen, setIsNavOpen, onSignOut }) {
       transition={{ duration: 0.25, ease: "easeInOut" }}
     >
       <div className="sidebar-header">
-        {/* {isNavOpen && <h1 className="sidebar-logo">ROUTE 200</h1>} */}
         {isNavOpen && (
           <div className="sidebar-logo">
             <img src="/logo.png" alt="Route 200 logo" />

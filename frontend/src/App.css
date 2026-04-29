@@ -305,20 +305,17 @@ section h3 {
   box-shadow: var(--shadow);
 }
 
-/* Make inputs match auth-card inputs */
 .trip-form input {
   padding: 14px 16px;
   border-radius: 16px;
   background: white;
 }
 
-/* Align date + number inputs visually */
 .trip-form input[type="date"],
 .trip-form input[type="number"] {
   font-family: inherit;
 }
 
-/* Button matches your primary gradient style */
 .trip-form button {
   margin-top: 6px;
   padding: 14px 18px;
@@ -330,7 +327,6 @@ section h3 {
   letter-spacing: 0.04em;
 }
 
-/* Optional hover polish */
 .trip-form button:hover {
   opacity: 0.95;
 }
