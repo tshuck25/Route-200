@@ -6,13 +6,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 
-from .models import Trip, SavedActivity
+from .models import Trip, Expense
 from .serializers import (
     RegisterSerializer,
     UserSerializer,
     TripSerializer,
     TripWriteSerializer,
-    SavedActivitySerializer,
+    ExpenseSerializer,
 )
 from . import services
 
@@ -56,22 +56,23 @@ class TripDetailView(generics.RetrieveUpdateDestroyAPIView):
         return TripWriteSerializer
 
 
-# Saved Activity Views
+# Expense Views (Lead 3 Implementation)
 
-class SavedActivityListCreateView(generics.ListCreateAPIView):
-    serializer_class = SavedActivitySerializer
+class ExpenseListCreateView(generics.ListCreateAPIView):
+    serializer_class = ExpenseSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return SavedActivity.objects.filter(trip__user=self.request.user)
+        # Only returns expenses for trips owned by the current user
+        return Expense.objects.filter(trip__user=self.request.user)
 
 
-class SavedActivityDetailView(generics.RetrieveDestroyAPIView):
-    serializer_class = SavedActivitySerializer
+class ExpenseDetailView(generics.RetrieveDestroyAPIView):
+    serializer_class = ExpenseSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return SavedActivity.objects.filter(trip__user=self.request.user)
+        return Expense.objects.filter(trip__user=self.request.user)
 
 
 # External API Proxy Views

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Trip, SavedActivity
+from .models import Trip, Expense
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -25,15 +25,15 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["id", "username", "email"]
 
 
-class SavedActivitySerializer(serializers.ModelSerializer):
+class ExpenseSerializer(serializers.ModelSerializer):
     class Meta:
-        model = SavedActivity
+        model = Expense
         fields = "__all__"
         read_only_fields = ["id", "created_at"]
 
 
 class TripSerializer(serializers.ModelSerializer):
-    activities = SavedActivitySerializer(many=True, read_only=True)
+    activities = ExpenseSerializer(many=True, read_only=True)
     user = UserSerializer(read_only=True)
 
     class Meta:
@@ -41,7 +41,7 @@ class TripSerializer(serializers.ModelSerializer):
         fields = [
             "id", "user", "title", "destination",
             "budget", "start_date", "end_date",
-            "created_at", "activities",
+            "created_at", "activities", "expenses"
         ]
         read_only_fields = ["id", "user", "created_at"]
 

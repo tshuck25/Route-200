@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Trip, SavedActivity
+from .models import Trip, Expense
 
 admin.site.register(Trip)
-admin.site.register(SavedActivity)
+admin.site.register(Expense)
