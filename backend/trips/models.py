@@ -23,6 +23,19 @@ class Expense(models.Model):
         ('other', 'Other'),
     ]
 
+class Destination(models.Model):
+    # Links to a trip OR can be a standalone "Suggested" destination
+    trip = models.ForeignKey(Trip, related_name='destinations', on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    is_featured = models.BooleanField(default=False)
+    is_suggested = models.BooleanField(default=False)
+    image_url = models.URLField(blank=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    
+    def __str__(self):
+        return self.name
+
     # The Relationship: One Trip -> Many Expenses
     trip = models.ForeignKey(Trip, related_name='expenses', on_delete=models.CASCADE)
     item_name = models.CharField(max_length=100)
