@@ -166,6 +166,20 @@ function App() {
       <Sidebar view={view} setView={setView} isNavOpen={isNavOpen} setIsNavOpen={setIsNavOpen} onSignOut={handleSignOut} />
       
       <main className="dashboard">
+ 
+ {/* Search Bar */}
+      
+      <form onSubmit={handleSearch} style={{ display: 'flex', gap: '10px', marginBottom: '30px' }}>
+        <input 
+          style={{ flex: 1, padding: '15px', borderRadius: '30px', border: '1px solid #ddd' }}
+          placeholder="Search destinations..." 
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <button type="submit" style={{ padding: '15px 30px', backgroundColor: '#1a2a6c', color: 'white', border: 'none', borderRadius: '30px', cursor: 'pointer', fontWeight: 'bold' }}>
+          Search
+        </button>
+      </form>
         {view === "home" && (
           <>
             <section className="hero">
