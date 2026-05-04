@@ -163,7 +163,13 @@ function App() {
 
   return (
     <div className="app-shell">
-      <Sidebar view={view} setView={setView} isNavOpen={isNavOpen} setIsNavOpen={setIsNavOpen} onSignOut={handleSignOut} />
+      <Sidebar
+        view={view}
+        setView={(newView) => { setView(newView); setShowResults(false); }}
+        isNavOpen={isNavOpen}
+        setIsNavOpen={setIsNavOpen}
+        onSignOut={handleSignOut}
+      />        
       
       <main className="dashboard">
  
@@ -180,7 +186,10 @@ function App() {
           Search
         </button>
       </form>
-        {view === "home" && (
+        
+      {view === 'search' && showResults ? (
+          <SearchResults searchQuery={searchQuery} token={token} />
+        ) : view === "home" && (
           <>
             <section className="hero">
               <div>
