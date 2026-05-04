@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Sidebar from "./components/Sidebar";
 import "./App.css";
+import SearchResults from './SearchResults';
 
 function App() {
   const [view, setView] = useState("home");
@@ -18,6 +19,9 @@ function App() {
   const [password, setPassword] = useState("");
   const [token, setToken] = useState(localStorage.getItem("access_token"));
   const [message, setMessage] = useState("");
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showResults, setShowResults] = useState(false);
 
   // ---------------- AUTH LOGIC ----------------
 
@@ -46,7 +50,15 @@ function App() {
       setMessage("Server connection failed.");
     }
   };
-
+//--------------Handle Search ----------------
+  
+  const handleSearch = (e) => {
+      e.preventDefault();
+      if (searchQuery.trim()) {
+        setShowResults(true);
+        setView('search');
+      }
+  };
   // ---------------- DATA FETCHING ----------------
 
   const fetchTrips = async () => {
