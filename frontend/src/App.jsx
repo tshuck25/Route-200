@@ -202,7 +202,7 @@ function App() {
               <input placeholder="Destination" value={destination} onChange={(e) => setDestination(e.target.value)} />
               <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
               <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-              <input type="number" placeholder="Budget" value={budget} onChange={(e) => setBudget(e.target.value)} />
+              <input type="number" placeholder="Set your buddget (USD)" value={budget} onChange={(e) => setBudget(e.target.value)} />
               <button onClick={createTrip}>Save Trip</button>
             </div>
 
