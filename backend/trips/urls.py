@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from .views import TripListCreateView, DestinationSearchView
 
 urlpatterns = [
     # Auth & Profile
@@ -16,4 +17,7 @@ urlpatterns = [
     # External API Proxies
     path('weather/', views.WeatherView.as_view(), name='weather'),
     path('flights/', views.FlightsView.as_view(), name='flights'),
+
+    # Search Routes
+    path('destinations/search/', DestinationSearchView.as_view(), name='destination-search'),
 ]
