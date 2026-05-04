@@ -4,6 +4,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .models import Destination
 from .serializers import DestinationSerializer
 from rest_framework import generics, status, permissions
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
