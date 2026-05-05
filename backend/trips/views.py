@@ -1,8 +1,7 @@
 import requests
 from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Destination
-from .serializers import DestinationSerializer
+from .models import Trip
 from rest_framework import generics, status, permissions
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
@@ -55,14 +54,13 @@ class TripListCreateView(generics.ListCreateAPIView):
 
 class DestinationSearchView(generics.ListAPIView):
     #Search and filter suggested destinations#
-    serializer_class = DestinationSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['name', 'description']
     filterset_fields = ['is_featured']
 
     def get_queryset(self):
-        queryset = Destination.objects.filter(is_suggested=True)
+        queryset = Trip.objects.filter(is_suggested=True)
         
         # Filter by price range if provided
         min_price = self.request.query_params.get('min_price')

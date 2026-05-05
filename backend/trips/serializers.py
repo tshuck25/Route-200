@@ -1,14 +1,8 @@
 from rest_framework import serializers
-<<<<<<< HEAD
-<<<<<<< HEAD
-from .models import Trip, Expense, Destination
-=======
 from .models import Trip, Expense
->>>>>>> 27ea0bca8d1fe8f23d1af39613ad4c675312a6bf
+from .models import Trip, Expense
 from django.db.models import Sum
-=======
 from .models import Trip, Expense
->>>>>>> 4900bda (Expense bar fixes)
 from django.contrib.auth.models import User
 
 
@@ -58,17 +52,11 @@ class TripSerializer(serializers.ModelSerializer):
 class TripWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Trip
-<<<<<<< HEAD
-<<<<<<< HEAD
         # REMOVED 'title' here as well to match the model
-=======
->>>>>>> 27ea0bca8d1fe8f23d1af39613ad4c675312a6bf
         fields = ['destination', 'total_budget', 'start_date', 'end_date']
 
-class DestinationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Destination
-        fields = ['id', 'name', 'description', 'is_featured', 'is_suggested', 'image_url', 'price']
-=======
-        fields = ['destination', 'total_budget', 'start_date', 'end_date']
->>>>>>> 4900bda (Expense bar fixes)
+# class DestinationSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Destination
+#         fields = ['id', 'name', 'description', 'is_featured', 'is_suggested', 'image_url', 'price']
+#         fields = ['destination', 'total_budget', 'start_date', 'end_date']

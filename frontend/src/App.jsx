@@ -2,15 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Sidebar from "./components/Sidebar";
 import "./App.css";
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 import BudgetProgressBar from "./components/BudgetProgressBar";
->>>>>>> 27ea0bca8d1fe8f23d1af39613ad4c675312a6bf
-import SearchResults from './SearchResults';
-=======
-import BudgetProgressBar from "./components/BudgetProgressBar";
->>>>>>> 4900bda (Expense bar fixes)
 
 function App() {
   const [view, setView] = useState("home");
@@ -28,25 +20,14 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem("access_token"));
   const [message, setMessage] = useState("");
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showResults, setShowResults] = useState(false);
-=======
-  // --- SEARCH & EXTERNAL API STATE ---
   const [searchQuery, setSearchQuery] = useState("");
   const [searchData, setSearchData] = useState({ weather: null, flights: null });
   const [isSearching, setIsSearching] = useState(false);
 
-  // --- STATE FOR EXPENSE UPDATES ---
   const [editingExpenseId, setEditingExpenseId] = useState(null);
   const [editExpenseData, setEditExpenseData] = useState({ item_name: "", amount: "" });
->>>>>>> 4900bda (Expense bar fixes)
 
-=======
->>>>>>> 27ea0bca8d1fe8f23d1af39613ad4c675312a6bf
   // ---------------- AUTH LOGIC ----------------
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const endpoint = isLoginView ? "token/" : "signup/";
@@ -72,17 +53,8 @@ function App() {
       setMessage("Server connection failed.");
     }
   };
-//--------------Handle Search ----------------
-  
-  const handleSearch = (e) => {
-      e.preventDefault();
-      if (searchQuery.trim()) {
-        setShowResults(true);
-        setView('search');
-      }
-  };
-  // ---------------- DATA FETCHING ----------------
 
+  // ---------------- DATA FETCHING ----------------
   const fetchTrips = async () => {
     if (!token) return;
     try {
@@ -99,39 +71,35 @@ function App() {
   useEffect(() => { fetchTrips(); }, [token]);
 
   // ---------------- SEARCH LOGIC ----------------
-
   const handleSearch = async (e) => {
-    if (e.key !== 'Enter' || !searchQuery) return;
+    // Only trigger if it's a form submit or Enter key
+    if (e.type === 'keydown' && e.key !== 'Enter') return;
+    if (e.preventDefault) e.preventDefault();
+    if (!searchQuery) return;
     
     setIsSearching(true);
     setView("search-results");
 
     try {
-      // 1. Fetch Weather
       const weatherRes = await fetch(`${import.meta.env.VITE_API_URL}/api/weather/?city=${searchQuery}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      // Handle the 502 error gracefully
       if (weatherRes.status === 502) {
-        const errorData = await weatherRes.json();
-        console.error("Backend Error:", errorData.error);
-        setSearchData(prev => ({ ...prev, weather: { error: errorData.error } }));
+        setSearchData(prev => ({ ...prev, weather: { error: "Weather service unavailable" } }));
       } else {
         const weather = await weatherRes.json();
-        setSearchData(prev => ({ ...prev, weather: weather }));
+        setSearchData(prev => ({ ...prev, weather }));
       }
 
-      // 2. Fetch Flights
       const flightRes = await fetch(`${import.meta.env.VITE_API_URL}/api/flights/?origin=NYC&destination=${searchQuery}&date=2026-06-01`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       
       if (flightRes.ok) {
         const flights = await flightRes.json();
-        setSearchData(prev => ({ ...prev, flights: flights }));
+        setSearchData(prev => ({ ...prev, flights }));
       }
-
     } catch (err) {
       console.error("Search API Error:", err);
     } finally {
@@ -140,7 +108,6 @@ function App() {
   };
 
   // ---------------- TRIP ACTIONS ----------------
-
   const createTrip = async () => {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/trips/`, {
       method: "POST",
@@ -154,7 +121,7 @@ function App() {
   };
 
   const deleteTrip = async (id) => {
-    if (!window.confirm("Delete this trip and all associated expenses?")) return;
+    if (!window.confirm("Delete this trip?")) return;
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/trips/${id}/`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
@@ -163,7 +130,7 @@ function App() {
   };
 
   const updateBudget = async (id, newBudget) => {
-    if (newBudget === null) return;
+    if (!newBudget) return;
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/trips/${id}/`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -173,22 +140,15 @@ function App() {
   };
 
   // ---------------- EXPENSE ACTIONS ----------------
-
   const addExpense = async (tripId) => {
     const nameEl = document.getElementById(`name-${tripId}`);
     const amtEl = document.getElementById(`amt-${tripId}`);
-    
     if (!nameEl.value || !amtEl.value) return;
 
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/expenses/`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ 
-        item_name: nameEl.value, 
-        amount: parseFloat(amtEl.value), 
-        trip: tripId, 
-        category: "other" 
-      }),
+      body: JSON.stringify({ item_name: nameEl.value, amount: parseFloat(amtEl.value), trip: tripId }),
     });
 
     if (response.ok) {
@@ -209,12 +169,8 @@ function App() {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/expenses/${expenseId}/`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ 
-        item_name: editExpenseData.item_name, 
-        amount: parseFloat(editExpenseData.amount) 
-      }),
+      body: JSON.stringify(editExpenseData),
     });
-
     if (response.ok) {
       setEditingExpenseId(null);
       fetchTrips();
@@ -248,153 +204,78 @@ function App() {
 
   return (
     <div className="app-shell">
-      <Sidebar
-        view={view}
-        setView={(newView) => { setView(newView); setShowResults(false); }}
-        isNavOpen={isNavOpen}
-        setIsNavOpen={setIsNavOpen}
-        onSignOut={handleSignOut}
-      />        
+      <Sidebar view={view} setView={setView} isNavOpen={isNavOpen} setIsNavOpen={setIsNavOpen} onSignOut={handleSignOut} />        
       
       <main className="dashboard">
- 
- {/* Search Bar */}
-      
-      <form onSubmit={handleSearch} style={{ display: 'flex', gap: '10px', marginBottom: '30px' }}>
-        <input 
-          style={{ flex: 1, padding: '15px', borderRadius: '30px', border: '1px solid #ddd' }}
-          placeholder="Search destinations..." 
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        <button type="submit" style={{ padding: '15px 30px', backgroundColor: '#1a2a6c', color: 'white', border: 'none', borderRadius: '30px', cursor: 'pointer', fontWeight: 'bold' }}>
-          Search
-        </button>
-      </form>
-        
-      {view === 'search' && showResults ? (
-          <SearchResults searchQuery={searchQuery} token={token} />
-        ) : view === "home" && (
-          <>
-            <section className="hero">
-              <div>
-                <p className="eyebrow">Lead 3 Milestone</p>
-                <h2>Track every mile and every dollar.</h2>
-              </div>
-            </section>
-
-            {/* INTEGRATED SEARCH BAR */}
+        {/* Global Search Bar (Only shows when not in results) */}
+        {view !== "search-results" && (
+          <form onSubmit={handleSearch} className="search-container">
             <input 
-              className="search-input"
-              placeholder="Where to next? (Enter city and press Enter)"
+              className="search-input-main"
+              placeholder="Search destinations (e.g. Tokyo)..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleSearch}
             />
+            <button type="submit" className="search-btn">Search</button>
+          </form>
+        )}
+        
+        {view === "home" && (
+          <>
+            <section className="hero">
+              <p className="eyebrow">Trip Dashboard</p>
+              <h2>Track every mile and every dollar.</h2>
+            </section>
 
             <div className="trip-form">
               <h3>Create New Trip</h3>
               <input placeholder="Destination" value={destination} onChange={(e) => setDestination(e.target.value)} />
-<<<<<<< HEAD
-              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-              <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-<<<<<<< HEAD
-              <input type="number" placeholder="Set your buddget (USD)" value={budget} onChange={(e) => setBudget(e.target.value)} />
-=======
-              <div style={{display: 'flex', gap: '10px'}}>
+              <div className="date-row">
                 <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
                 <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
               </div>
-              <input type="number" placeholder="Budget" value={budget} onChange={(e) => setBudget(e.target.value)} />
->>>>>>> 4900bda (Expense bar fixes)
-=======
-              <input type="number" placeholder="Budget" value={budget} onChange={(e) => setBudget(e.target.value)} />
->>>>>>> 27ea0bca8d1fe8f23d1af39613ad4c675312a6bf
+              <input type="number" placeholder="Budget (USD)" value={budget} onChange={(e) => setBudget(e.target.value)} />
               <button onClick={createTrip}>Save Trip</button>
             </div>
 
             <section>
-              <h3>Recent Trips</h3>
+              <h3>My Trips</h3>
               <div className="saved-list">
                 {trips.map(trip => (
                   <article key={trip.id} className="trip-card">
                     <h4>{trip.destination}</h4>
-                    <BudgetProgressBar 
-                      spent={trip.total_spent} 
-                      budget={trip.total_budget} 
-                    />
-                    {/* Action Buttons with Fixed Styling */}
-                        <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
-                          <button 
-                            onClick={() => updateBudget(trip.id, prompt("New Budget:", trip.total_budget))} 
-                            style={{ 
-                              flex: 1, 
-                              padding: "10px", 
-                              fontSize: "0.8rem", 
-                              background: "var(--primary-light)", 
-                              color: "white", 
-                              borderRadius: "12px", 
-                              fontWeight: "700" 
-                            }}
-                          >
-                            Edit Budget
-                          </button>
-                          
-                          <button 
-                            onClick={() => deleteTrip(trip.id)} 
-                            style={{ 
-                              flex: 1, 
-                              padding: "10px", 
-                              fontSize: "0.8rem", 
-                              background: "var(--danger)", 
-                              color: "white", 
-                              borderRadius: "12px", 
-                              fontWeight: "700" 
-                            }}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                </section>
+                    <BudgetProgressBar spent={trip.total_spent} budget={trip.total_budget} />
+                    <div className="card-actions">
+                      <button onClick={() => updateBudget(trip.id, prompt("New Budget:", trip.total_budget))}>Edit Budget</button>
+                      <button className="danger-btn" onClick={() => deleteTrip(trip.id)}>Delete</button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
           </>
         )}
 
-        {/* NEW SEARCH RESULTS VIEW */}
         {view === "search-results" && (
           <section>
             <button onClick={() => setView("home")} className="text-button">← Back to Dashboard</button>
-            <h2>Exploration: {searchQuery}</h2>
-            
-            {isSearching ? (
-              <p className="message">Searching for flights and weather info...</p>
-            ) : (
+            <h2>Results for: {searchQuery}</h2>
+            {isSearching ? <p>Loading data...</p> : (
               <div className="destination-grid">
-                {/* Weather Data */}
                 <div className="trip-card">
-                  <p className="eyebrow">Destination Weather</p>
+                  <p className="eyebrow">Weather</p>
                   {searchData.weather?.main ? (
-                    <>
+                    <div>
                       <h4>{searchData.weather.main.temp}°C</h4>
                       <p>{searchData.weather.weather[0].description}</p>
-                      <p>Humidity: {searchData.weather.main.humidity}%</p>
-                    </>
-                  ) : <p>Weather data currently unavailable.</p>}
+                    </div>
+                  ) : <p>Weather unavailable.</p>}
                 </div>
-
-                {/* Flight Data */}
                 <div className="trip-card">
-                  <p className="eyebrow">Flight Information</p>
-                  {searchData.flights?.length > 0 ? (
-                    searchData.flights.slice(0, 3).map((f, i) => (
-                      <div key={i} style={{borderBottom: '1px solid var(--border)', padding: '5px 0'}}>
-                        <p><strong>{f.airline}</strong>: ${f.price}</p>
-                        <p style={{fontSize: '0.8rem'}}>{f.departure_time} - {f.arrival_time}</p>
-                      </div>
-                    ))
-                  ) : <p>No flight routes found for this date.</p>}
+                  <p className="eyebrow">Flights</p>
+                  {searchData.flights?.slice(0, 3).map((f, i) => (
+                    <p key={i}><strong>{f.airline}</strong>: ${f.price}</p>
+                  )) || <p>No flights found.</p>}
                 </div>
               </div>
             )}
@@ -405,30 +286,26 @@ function App() {
           <section>
             <h2>Expense Tracker</h2>
             {trips.map(trip => (
-              <div key={trip.id} style={{ marginBottom: "30px", paddingBottom: "20px", borderBottom: "1px solid var(--border)" }}>
-                <h3 style={{ color: "var(--primary)" }}>{trip.destination}</h3>
-                <div style={{ display: "flex", gap: "10px", marginBottom: "15px" }}>
-                  <input id={`name-${trip.id}`} placeholder="Item Name" style={{ flex: 2 }} />
-                  <input id={`amt-${trip.id}`} type="number" placeholder="Amount" style={{ flex: 1 }} />
-                  <button onClick={() => addExpense(trip.id)} style={{ padding: "10px 20px", background: "var(--primary)", color: "white", borderRadius: "12px" }}>Add</button>
+              <div key={trip.id} className="expense-group">
+                <h3>{trip.destination}</h3>
+                <div className="add-expense-row">
+                  <input id={`name-${trip.id}`} placeholder="Item" />
+                  <input id={`amt-${trip.id}`} type="number" placeholder="Amount" />
+                  <button onClick={() => addExpense(trip.id)}>Add</button>
                 </div>
-                {trip.expenses && trip.expenses.map(exp => (
-                  <div key={exp.id} className="trip-card" style={{ display: "flex", justifyContent: "space-between", padding: "10px", marginBottom: "8px", alignItems: "center" }}>
+                {trip.expenses?.map(exp => (
+                  <div key={exp.id} className="expense-item">
                     {editingExpenseId === exp.id ? (
-                      <div style={{ display: "flex", gap: "10px", flex: 1 }}>
-                        <input value={editExpenseData.item_name} onChange={(e) => setEditExpenseData({...editExpenseData, item_name: e.target.value})} style={{ flex: 2 }} />
-                        <input type="number" value={editExpenseData.amount} onChange={(e) => setEditExpenseData({...editExpenseData, amount: e.target.value})} style={{ flex: 1 }} />
-                        <button onClick={() => updateExpense(exp.id)} style={{ color: "green" }}>Save</button>
-                        <button onClick={() => setEditingExpenseId(null)}>Cancel</button>
-                      </div>
+                      <>
+                        <input value={editExpenseData.item_name} onChange={(e) => setEditExpenseData({...editExpenseData, item_name: e.target.value})} />
+                        <input type="number" value={editExpenseData.amount} onChange={(e) => setEditExpenseData({...editExpenseData, amount: e.target.value})} />
+                        <button onClick={() => updateExpense(exp.id)}>Save</button>
+                      </>
                     ) : (
                       <>
-                        <span>{exp.item_name}</span>
-                        <div>
-                          <span style={{ fontWeight: "bold", marginRight: "15px" }}>${exp.amount}</span>
-                          <button onClick={() => { setEditingExpenseId(exp.id); setEditExpenseData({ item_name: exp.item_name, amount: exp.amount }); }} style={{marginRight: '10px'}}>✎</button>
-                          <button onClick={() => deleteExpense(exp.id)} style={{ color: "var(--danger)" }}>✕</button>
-                        </div>
+                        <span>{exp.item_name} - ${exp.amount}</span>
+                        <button onClick={() => {setEditingExpenseId(exp.id); setEditExpenseData({item_name: exp.item_name, amount: exp.amount})}}>✎</button>
+                        <button onClick={() => deleteExpense(exp.id)}>✕</button>
                       </>
                     )}
                   </div>
