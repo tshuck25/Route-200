@@ -3,6 +3,10 @@ import { motion } from "framer-motion";
 import Sidebar from "./components/Sidebar";
 import "./App.css";
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+import BudgetProgressBar from "./components/BudgetProgressBar";
+>>>>>>> 27ea0bca8d1fe8f23d1af39613ad4c675312a6bf
 import SearchResults from './SearchResults';
 =======
 import BudgetProgressBar from "./components/BudgetProgressBar";
@@ -25,6 +29,7 @@ function App() {
   const [message, setMessage] = useState("");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   const [searchQuery, setSearchQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
 =======
@@ -38,6 +43,8 @@ function App() {
   const [editExpenseData, setEditExpenseData] = useState({ item_name: "", amount: "" });
 >>>>>>> 4900bda (Expense bar fixes)
 
+=======
+>>>>>>> 27ea0bca8d1fe8f23d1af39613ad4c675312a6bf
   // ---------------- AUTH LOGIC ----------------
 
   const handleSubmit = async (e) => {
@@ -291,6 +298,7 @@ function App() {
 <<<<<<< HEAD
               <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
               <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+<<<<<<< HEAD
               <input type="number" placeholder="Set your buddget (USD)" value={budget} onChange={(e) => setBudget(e.target.value)} />
 =======
               <div style={{display: 'flex', gap: '10px'}}>
@@ -299,6 +307,9 @@ function App() {
               </div>
               <input type="number" placeholder="Budget" value={budget} onChange={(e) => setBudget(e.target.value)} />
 >>>>>>> 4900bda (Expense bar fixes)
+=======
+              <input type="number" placeholder="Budget" value={budget} onChange={(e) => setBudget(e.target.value)} />
+>>>>>>> 27ea0bca8d1fe8f23d1af39613ad4c675312a6bf
               <button onClick={createTrip}>Save Trip</button>
             </div>
 
