@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import Sidebar from "./components/Sidebar";
 import "./App.css";
 import BudgetProgressBar from "./components/BudgetProgressBar";
+import SearchResults from './SearchResults';
 
 function App() {
   const [view, setView] = useState("home");
@@ -19,15 +20,6 @@ function App() {
   const [password, setPassword] = useState("");
   const [token, setToken] = useState(localStorage.getItem("access_token"));
   const [message, setMessage] = useState("");
-
-  // --- SEARCH & EXTERNAL API STATE ---
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchData, setSearchData] = useState({ weather: null, flights: null });
-  const [isSearching, setIsSearching] = useState(false);
-
-  // --- STATE FOR EXPENSE UPDATES ---
-  const [editingExpenseId, setEditingExpenseId] = useState(null);
-  const [editExpenseData, setEditExpenseData] = useState({ item_name: "", amount: "" });
 
   // ---------------- AUTH LOGIC ----------------
 
@@ -56,7 +48,15 @@ function App() {
       setMessage("Server connection failed.");
     }
   };
-
+//--------------Handle Search ----------------
+  
+  const handleSearch = (e) => {
+      e.preventDefault();
+      if (searchQuery.trim()) {
+        setShowResults(true);
+        setView('search');
+      }
+  };
   // ---------------- DATA FETCHING ----------------
 
   const fetchTrips = async () => {
@@ -224,10 +224,33 @@ function App() {
 
   return (
     <div className="app-shell">
-      <Sidebar view={view} setView={setView} isNavOpen={isNavOpen} setIsNavOpen={setIsNavOpen} onSignOut={handleSignOut} />
+      <Sidebar
+        view={view}
+        setView={(newView) => { setView(newView); setShowResults(false); }}
+        isNavOpen={isNavOpen}
+        setIsNavOpen={setIsNavOpen}
+        onSignOut={handleSignOut}
+      />        
       
       <main className="dashboard">
-        {view === "home" && (
+ 
+ {/* Search Bar */}
+      
+      <form onSubmit={handleSearch} style={{ display: 'flex', gap: '10px', marginBottom: '30px' }}>
+        <input 
+          style={{ flex: 1, padding: '15px', borderRadius: '30px', border: '1px solid #ddd' }}
+          placeholder="Search destinations..." 
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <button type="submit" style={{ padding: '15px 30px', backgroundColor: '#1a2a6c', color: 'white', border: 'none', borderRadius: '30px', cursor: 'pointer', fontWeight: 'bold' }}>
+          Search
+        </button>
+      </form>
+        
+      {view === 'search' && showResults ? (
+          <SearchResults searchQuery={searchQuery} token={token} />
+        ) : view === "home" && (
           <>
             <section className="hero">
               <div>
@@ -248,10 +271,8 @@ function App() {
             <div className="trip-form">
               <h3>Create New Trip</h3>
               <input placeholder="Destination" value={destination} onChange={(e) => setDestination(e.target.value)} />
-              <div style={{display: 'flex', gap: '10px'}}>
-                <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-                <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-              </div>
+              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+              <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
               <input type="number" placeholder="Budget" value={budget} onChange={(e) => setBudget(e.target.value)} />
               <button onClick={createTrip}>Save Trip</button>
             </div>

@@ -48,13 +48,8 @@ class Expense(models.Model):
         ('other', 'Other'),
     ]
 
-    # If the Trip is deleted, all its expenses are deleted (CASCADE)
-    trip = models.ForeignKey(
-        Trip, 
-        related_name='expenses', 
-        on_delete=models.CASCADE
-    )
-    
+    # The Relationship: One Trip -> Many Expenses
+    trip = models.ForeignKey(Trip, related_name='expenses', on_delete=models.CASCADE)
     item_name = models.CharField(max_length=100)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.CharField(
@@ -64,9 +59,6 @@ class Expense(models.Model):
     )
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
+    
     def __str__(self):
-        return f"{self.item_name}: ${self.amount} for {self.trip.destination}"
-
-    class Meta:
-        ordering = ['-created_at'] # Shows newest expenses first
+        return f"{self.item_name}: ${self.amount} ({self.trip.destination})"

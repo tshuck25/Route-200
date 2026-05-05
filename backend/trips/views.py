@@ -1,5 +1,10 @@
 import requests
+from rest_framework.filters import SearchFilter
+from django_filters.rest_framework import DjangoFilterBackend
+from .models import Destination
+from .serializers import DestinationSerializer
 from rest_framework import generics, status, permissions
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.models import User
@@ -47,6 +52,28 @@ class TripListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         # Automatically associate the trip with the logged-in user
         serializer.save(user=self.request.user)
+
+class DestinationSearchView(generics.ListAPIView):
+    #Search and filter suggested destinations#
+    serializer_class = DestinationSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    search_fields = ['name', 'description']
+    filterset_fields = ['is_featured']
+
+    def get_queryset(self):
+        queryset = Destination.objects.filter(is_suggested=True)
+        
+        # Filter by price range if provided
+        min_price = self.request.query_params.get('min_price')
+        max_price = self.request.query_params.get('max_price')
+        
+        if min_price:
+            queryset = queryset.filter(price__gte=min_price)
+        if max_price:
+            queryset = queryset.filter(price__lte=max_price)
+        
+        return queryset
 
 
 class TripDetailView(generics.RetrieveUpdateDestroyAPIView):

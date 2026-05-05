@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import Trip, Expense
+from django.db.models import Sum
 from django.contrib.auth.models import User
+
 
 # --- AUTH SERIALIZERS ---
 class UserSerializer(serializers.ModelSerializer):
@@ -49,3 +51,8 @@ class TripWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Trip
         fields = ['destination', 'total_budget', 'start_date', 'end_date']
+
+class DestinationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Destination
+        fields = ['id', 'name', 'description', 'is_featured', 'is_suggested', 'image_url', 'price']
