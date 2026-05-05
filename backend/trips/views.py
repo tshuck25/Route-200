@@ -2,8 +2,6 @@ import requests
 from rest_framework import generics, status, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 
 from .models import Trip, Expense
@@ -17,9 +15,12 @@ from .serializers import (
 from . import services
 
 
-# Auth Views
+# --- AUTH VIEWS ---
 
 class ProfileView(generics.RetrieveAPIView):
+    """
+    Returns the profile data of the currently authenticated user.
+    """
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -27,9 +28,12 @@ class ProfileView(generics.RetrieveAPIView):
         return self.request.user
 
 
-# Trip Views
+# --- TRIP VIEWS ---
 
 class TripListCreateView(generics.ListCreateAPIView):
+    """
+    List all trips for the user or create a new trip.
+    """
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -41,10 +45,14 @@ class TripListCreateView(generics.ListCreateAPIView):
         return TripWriteSerializer
 
     def perform_create(self, serializer):
+        # Automatically associate the trip with the logged-in user
         serializer.save(user=self.request.user)
 
 
 class TripDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, update, or delete a specific trip.
+    """
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -56,9 +64,12 @@ class TripDetailView(generics.RetrieveUpdateDestroyAPIView):
         return TripWriteSerializer
 
 
-# Expense Views (Lead 3 Implementation)
+# --- EXPENSE VIEWS ---
 
 class ExpenseListCreateView(generics.ListCreateAPIView):
+    """
+    List all expenses across user trips or create a new expense for a trip.
+    """
     serializer_class = ExpenseSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -66,16 +77,25 @@ class ExpenseListCreateView(generics.ListCreateAPIView):
         # Only returns expenses for trips owned by the current user
         return Expense.objects.filter(trip__user=self.request.user)
 
+    def perform_create(self, serializer):
+        # The trip ID comes from the frontend; the serializer handles the link.
+        serializer.save()
 
-class ExpenseDetailView(generics.RetrieveDestroyAPIView):
+
+class ExpenseDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, Update (PATCH), or Delete an individual expense.
+    Enabled 'Update' by switching to RetrieveUpdateDestroyAPIView.
+    """
     serializer_class = ExpenseSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        # Users can only modify expenses belonging to their own trips
         return Expense.objects.filter(trip__user=self.request.user)
 
 
-# External API Proxy Views
+# --- EXTERNAL API PROXY VIEWS ---
 
 class WeatherView(APIView):
     permission_classes = [permissions.IsAuthenticated]

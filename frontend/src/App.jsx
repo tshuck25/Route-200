@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Sidebar from "./components/Sidebar";
 import "./App.css";
+import BudgetProgressBar from "./components/BudgetProgressBar";
 
 function App() {
   const [view, setView] = useState("home");
@@ -18,6 +19,15 @@ function App() {
   const [password, setPassword] = useState("");
   const [token, setToken] = useState(localStorage.getItem("access_token"));
   const [message, setMessage] = useState("");
+
+  // --- SEARCH & EXTERNAL API STATE ---
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchData, setSearchData] = useState({ weather: null, flights: null });
+  const [isSearching, setIsSearching] = useState(false);
+
+  // --- STATE FOR EXPENSE UPDATES ---
+  const [editingExpenseId, setEditingExpenseId] = useState(null);
+  const [editExpenseData, setEditExpenseData] = useState({ item_name: "", amount: "" });
 
   // ---------------- AUTH LOGIC ----------------
 
@@ -64,6 +74,47 @@ function App() {
 
   useEffect(() => { fetchTrips(); }, [token]);
 
+  // ---------------- SEARCH LOGIC ----------------
+
+  const handleSearch = async (e) => {
+    if (e.key !== 'Enter' || !searchQuery) return;
+    
+    setIsSearching(true);
+    setView("search-results");
+
+    try {
+      // 1. Fetch Weather
+      const weatherRes = await fetch(`${import.meta.env.VITE_API_URL}/api/weather/?city=${searchQuery}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Handle the 502 error gracefully
+      if (weatherRes.status === 502) {
+        const errorData = await weatherRes.json();
+        console.error("Backend Error:", errorData.error);
+        setSearchData(prev => ({ ...prev, weather: { error: errorData.error } }));
+      } else {
+        const weather = await weatherRes.json();
+        setSearchData(prev => ({ ...prev, weather: weather }));
+      }
+
+      // 2. Fetch Flights
+      const flightRes = await fetch(`${import.meta.env.VITE_API_URL}/api/flights/?origin=NYC&destination=${searchQuery}&date=2026-06-01`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      if (flightRes.ok) {
+        const flights = await flightRes.json();
+        setSearchData(prev => ({ ...prev, flights: flights }));
+      }
+
+    } catch (err) {
+      console.error("Search API Error:", err);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   // ---------------- TRIP ACTIONS ----------------
 
   const createTrip = async () => {
@@ -88,6 +139,7 @@ function App() {
   };
 
   const updateBudget = async (id, newBudget) => {
+    if (newBudget === null) return;
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/trips/${id}/`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -107,7 +159,12 @@ function App() {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/expenses/`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ item_name: nameEl.value, amount: amtEl.value, trip: tripId, category: "Other" }),
+      body: JSON.stringify({ 
+        item_name: nameEl.value, 
+        amount: parseFloat(amtEl.value), 
+        trip: tripId, 
+        category: "other" 
+      }),
     });
 
     if (response.ok) {
@@ -122,6 +179,22 @@ function App() {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (response.ok) fetchTrips();
+  };
+
+  const updateExpense = async (expenseId) => {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/expenses/${expenseId}/`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ 
+        item_name: editExpenseData.item_name, 
+        amount: parseFloat(editExpenseData.amount) 
+      }),
+    });
+
+    if (response.ok) {
+      setEditingExpenseId(null);
+      fetchTrips();
+    }
   };
 
   const handleSignOut = () => {
@@ -163,10 +236,22 @@ function App() {
               </div>
             </section>
 
+            {/* INTEGRATED SEARCH BAR */}
+            <input 
+              className="search-input"
+              placeholder="Where to next? (Enter city and press Enter)"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleSearch}
+            />
+
             <div className="trip-form">
+              <h3>Create New Trip</h3>
               <input placeholder="Destination" value={destination} onChange={(e) => setDestination(e.target.value)} />
-              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-              <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+              <div style={{display: 'flex', gap: '10px'}}>
+                <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+              </div>
               <input type="number" placeholder="Budget" value={budget} onChange={(e) => setBudget(e.target.value)} />
               <button onClick={createTrip}>Save Trip</button>
             </div>
@@ -177,16 +262,86 @@ function App() {
                 {trips.map(trip => (
                   <article key={trip.id} className="trip-card">
                     <h4>{trip.destination}</h4>
-                    <p style={{ color: "var(--muted)", margin: "4px 0" }}>Budget: ${trip.total_budget} | Spent: ${trip.total_spent}</p>
-                    <div style={{ display: "flex", gap: "8px", marginTop: "10px" }}>
-                      <button onClick={() => updateBudget(trip.id, prompt("New Budget:", trip.total_budget))} style={{ fontSize: "0.7rem", padding: "5px", background: "var(--primary-light)", color: "white", borderRadius: "4px" }}>Edit</button>
-                      <button onClick={() => deleteTrip(trip.id)} style={{ fontSize: "0.7rem", padding: "5px", background: "var(--danger)", color: "white", borderRadius: "4px" }}>Delete</button>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </section>
+                    <BudgetProgressBar 
+                      spent={trip.total_spent} 
+                      budget={trip.total_budget} 
+                    />
+                    {/* Action Buttons with Fixed Styling */}
+                        <div style={{ display: "flex", gap: "10px", marginTop: "20px" }}>
+                          <button 
+                            onClick={() => updateBudget(trip.id, prompt("New Budget:", trip.total_budget))} 
+                            style={{ 
+                              flex: 1, 
+                              padding: "10px", 
+                              fontSize: "0.8rem", 
+                              background: "var(--primary-light)", 
+                              color: "white", 
+                              borderRadius: "12px", 
+                              fontWeight: "700" 
+                            }}
+                          >
+                            Edit Budget
+                          </button>
+                          
+                          <button 
+                            onClick={() => deleteTrip(trip.id)} 
+                            style={{ 
+                              flex: 1, 
+                              padding: "10px", 
+                              fontSize: "0.8rem", 
+                              background: "var(--danger)", 
+                              color: "white", 
+                              borderRadius: "12px", 
+                              fontWeight: "700" 
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                </section>
           </>
+        )}
+
+        {/* NEW SEARCH RESULTS VIEW */}
+        {view === "search-results" && (
+          <section>
+            <button onClick={() => setView("home")} className="text-button">← Back to Dashboard</button>
+            <h2>Exploration: {searchQuery}</h2>
+            
+            {isSearching ? (
+              <p className="message">Searching for flights and weather info...</p>
+            ) : (
+              <div className="destination-grid">
+                {/* Weather Data */}
+                <div className="trip-card">
+                  <p className="eyebrow">Destination Weather</p>
+                  {searchData.weather?.main ? (
+                    <>
+                      <h4>{searchData.weather.main.temp}°C</h4>
+                      <p>{searchData.weather.weather[0].description}</p>
+                      <p>Humidity: {searchData.weather.main.humidity}%</p>
+                    </>
+                  ) : <p>Weather data currently unavailable.</p>}
+                </div>
+
+                {/* Flight Data */}
+                <div className="trip-card">
+                  <p className="eyebrow">Flight Information</p>
+                  {searchData.flights?.length > 0 ? (
+                    searchData.flights.slice(0, 3).map((f, i) => (
+                      <div key={i} style={{borderBottom: '1px solid var(--border)', padding: '5px 0'}}>
+                        <p><strong>{f.airline}</strong>: ${f.price}</p>
+                        <p style={{fontSize: '0.8rem'}}>{f.departure_time} - {f.arrival_time}</p>
+                      </div>
+                    ))
+                  ) : <p>No flight routes found for this date.</p>}
+                </div>
+              </div>
+            )}
+          </section>
         )}
 
         {view === "expenses" && (
@@ -200,13 +355,25 @@ function App() {
                   <input id={`amt-${trip.id}`} type="number" placeholder="Amount" style={{ flex: 1 }} />
                   <button onClick={() => addExpense(trip.id)} style={{ padding: "10px 20px", background: "var(--primary)", color: "white", borderRadius: "12px" }}>Add</button>
                 </div>
-                {trip.expenses.map(exp => (
-                  <div key={exp.id} style={{ display: "flex", justifyContent: "space-between", padding: "10px", background: "white", borderRadius: "12px", marginBottom: "8px", border: "1px solid var(--border)" }}>
-                    <span>{exp.item_name}</span>
-                    <div>
-                      <span style={{ fontWeight: "bold", marginRight: "15px" }}>${exp.amount}</span>
-                      <button onClick={() => deleteExpense(exp.id)} style={{ color: "var(--danger)", background: "none", border: "none", cursor: "pointer" }}>✕</button>
-                    </div>
+                {trip.expenses && trip.expenses.map(exp => (
+                  <div key={exp.id} className="trip-card" style={{ display: "flex", justifyContent: "space-between", padding: "10px", marginBottom: "8px", alignItems: "center" }}>
+                    {editingExpenseId === exp.id ? (
+                      <div style={{ display: "flex", gap: "10px", flex: 1 }}>
+                        <input value={editExpenseData.item_name} onChange={(e) => setEditExpenseData({...editExpenseData, item_name: e.target.value})} style={{ flex: 2 }} />
+                        <input type="number" value={editExpenseData.amount} onChange={(e) => setEditExpenseData({...editExpenseData, amount: e.target.value})} style={{ flex: 1 }} />
+                        <button onClick={() => updateExpense(exp.id)} style={{ color: "green" }}>Save</button>
+                        <button onClick={() => setEditingExpenseId(null)}>Cancel</button>
+                      </div>
+                    ) : (
+                      <>
+                        <span>{exp.item_name}</span>
+                        <div>
+                          <span style={{ fontWeight: "bold", marginRight: "15px" }}>${exp.amount}</span>
+                          <button onClick={() => { setEditingExpenseId(exp.id); setEditExpenseData({ item_name: exp.item_name, amount: exp.amount }); }} style={{marginRight: '10px'}}>✎</button>
+                          <button onClick={() => deleteExpense(exp.id)} style={{ color: "var(--danger)" }}>✕</button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 ))}
               </div>
