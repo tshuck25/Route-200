@@ -1,24 +1,64 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models import Sum
 
 class Trip(models.Model):
+    """
+    Represents a travel event. Links to a User and contains multiple Expenses.
+    """
+    # Links the trip to a specific user. If user is deleted, their trips are deleted.
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='trips')
-    title = models.CharField(max_length=200)
-    start_date = models.DateField()
-    end_date = models.DateField()
-    budget = models.DecimalField(max_digits=10, decimal_places=2, default=0.00) # Added for detail bar [cite: 30]
+    
+    destination = models.CharField(max_length=255)
+    total_budget = models.DecimalField(max_digits=10, decimal_places=2)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def total_spent(self):
+        """
+        Dynamically calculates the sum of all associated expenses.
+        Returns 0 if no expenses exist.
+        """
+        total = self.expenses.aggregate(total=Sum('amount'))['total']
+        return total if total else 0
+
+    @property
+    def remaining_budget(self):
+        """
+        Calculates how much money is left in the budget.
+        """
+        return self.total_budget - self.total_spent
 
     def __str__(self):
-        return self.title
+        return f"{self.destination} ({self.user.username})"
 
-class Destination(models.Model):
-    # Links to a trip OR can be a standalone "Suggested" destination
-    trip = models.ForeignKey(Trip, related_name='destinations', on_delete=models.CASCADE, null=True, blank=True)
-    name = models.CharField(max_length=200)
-    description = models.TextField(blank=True)
-    is_featured = models.BooleanField(default=False) # For Page 2 [cite: 11]
-    is_suggested = models.BooleanField(default=False) # For Page 2 [cite: 10]
-    image_url = models.URLField(blank=True) # For Picture placeholders [cite: 43]
 
+class Expense(models.Model):
+    """
+    Represents an individual cost item associated with a Trip.
+    """
+    # Choices match the lowercase expected by Django but look nice in Admin
+    CATEGORY_CHOICES = [
+        ('food', 'Food & Dining'),
+        ('transport', 'Transportation'),
+        ('lodging', 'Lodging'),
+        ('entertainment', 'Entertainment'),
+        ('other', 'Other'),
+    ]
+
+    # The Relationship: One Trip -> Many Expenses
+    trip = models.ForeignKey(Trip, related_name='expenses', on_delete=models.CASCADE)
+    item_name = models.CharField(max_length=100)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    category = models.CharField(
+        max_length=50, 
+        choices=CATEGORY_CHOICES, 
+        default='other'
+    )
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
     def __str__(self):
-        return self.name
+        return f"{self.item_name}: ${self.amount} ({self.trip.destination})"
