@@ -223,8 +223,8 @@ function App() {
         {view === "home" && (
           <>
             <section className="hero">
-              <p className="eyebrow">Trip Dashboard</p>
-              <h2>Track every mile and every dollar.</h2>
+              <p className="eyebrow">Plan Smarter. Spend Better.</p>
+              <h2>Build your next trip with confidence.</h2>
             </section>
 
             <div className="trip-form">
