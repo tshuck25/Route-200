@@ -412,6 +412,16 @@ h4 {
   gap: 12px;
 }
 
+input[type="date"] {
+  appearance: none;
+  -webkit-appearance: none;
+  color: #6f6f6f;
+}
+
+input[type="date"].has-value {
+  color: #6f6f6f;
+}
+
 /* Trips */
 
 .saved-list {
