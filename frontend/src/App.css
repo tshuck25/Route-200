@@ -641,3 +641,327 @@ input[type="date"].has-value {
     display: none;
   }
 }
+
+/* SEARCH RESULTS */
+
+.results-layout {
+  display: grid;
+  gap: 28px;
+}
+
+.results-hero {
+  padding: 32px;
+
+  border-radius: 28px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(15,23,42,0.92),
+      rgba(37,99,235,0.82)
+    );
+
+  color: white;
+
+  box-shadow: var(--shadow);
+}
+
+.results-hero h1 {
+  margin: 0 0 10px;
+
+  font-size: clamp(2.2rem, 5vw, 4rem);
+}
+
+.results-hero p {
+  margin: 0;
+
+  color: rgba(255,255,255,0.82);
+
+  font-size: 1rem;
+}
+
+.results-section {
+  display: grid;
+  gap: 18px;
+}
+
+.section-header h2 {
+  margin: 0;
+
+  font-size: 1.5rem;
+}
+
+.results-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fit, minmax(320px, 1fr));
+
+  gap: 20px;
+}
+
+.result-card {
+  overflow: hidden;
+
+  border-radius: 24px;
+
+  background: var(--panel);
+
+  border: 1px solid var(--border);
+
+  box-shadow: var(--shadow);
+
+  transition: var(--transition);
+}
+
+.result-card:hover {
+  transform: translateY(-4px);
+}
+
+.result-image {
+  width: 100%;
+  height: 220px;
+
+  object-fit: cover;
+
+  display: block;
+}
+
+.result-content {
+  padding: 18px;
+}
+
+.result-content h3 {
+  margin: 0 0 10px;
+
+  font-size: 1.2rem;
+}
+
+.result-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-bottom: 10px;
+
+  color: var(--muted);
+
+  font-weight: 600;
+}
+
+.result-address,
+.result-date {
+  margin-bottom: 12px;
+
+  color: var(--muted);
+
+  line-height: 1.5;
+}
+
+.result-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  margin-bottom: 16px;
+}
+
+.tag {
+  padding: 6px 10px;
+
+  border-radius: 999px;
+
+  background: rgba(37,99,235,0.08);
+
+  color: var(--primary-light);
+
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.result-link {
+  display: inline-flex;
+
+  padding: 10px 14px;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--primary),
+      var(--primary-light)
+    );
+
+  color: white;
+
+  text-decoration: none;
+
+  font-weight: 700;
+}
+
+.auth-logo {
+  height: 100px;
+
+  margin-bottom: 20px;
+}
+
+.loading-state,
+.error-state {
+  padding: 40px;
+
+  border-radius: 24px;
+
+  background: var(--panel);
+
+  text-align: center;
+
+  box-shadow: var(--shadow);
+}
+
+.weather-card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+
+.weather-card h3 {
+  font-size: 3rem;
+  margin: 0;
+}
+
+.weather-card p {
+  margin-top: 8px;
+  color: var(--muted);
+  text-transform: capitalize;
+}
+
+.weather-meta {
+  display: flex;
+  gap: 18px;
+  margin-top: 16px;
+  font-weight: 600;
+}
+
+.flight-toolbar {
+  display: flex;
+  gap: 20px;
+
+  align-items: end;
+
+  margin-bottom: 24px;
+
+  padding: 20px;
+
+  border-radius: 20px;
+
+  background: var(--panel);
+
+  box-shadow: var(--shadow);
+}
+
+.flight-toolbar-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.flight-toolbar-group label {
+  font-size: 0.82rem;
+  font-weight: 700;
+
+  color: var(--muted);
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.08em;
+}
+
+.flight-toolbar select {
+  height: 48px;
+
+  min-width: 240px;
+
+  padding: 0 14px;
+
+  border-radius: 14px;
+
+  border: 1px solid var(--border);
+
+  background: white;
+
+  font: inherit;
+}
+
+.airport-display {
+  height: 48px;
+
+  min-width: 140px;
+
+  padding: 0 18px;
+
+  display: flex;
+  align-items: center;
+
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--primary),
+      var(--primary-light)
+    );
+
+  color: white;
+
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+
+  .flight-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .flight-toolbar select,
+  .airport-display {
+    width: 100%;
+  }
+
+}
+
+.card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.save-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 38px;
+  height: 38px;
+
+  border-radius: 12px;
+
+  background: rgba(37,99,235,0.08);
+
+  color: var(--primary-light);
+
+  border: 1px solid rgba(37,99,235,0.12);
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.save-btn:hover {
+  transform: scale(1.08);
+
+  background: rgba(37,99,235,0.16);
+}
