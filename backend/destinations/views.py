@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from .models import DestinationCatalog
-from .external_apis import get_restaurants, get_events
+from .external_apis import get_restaurants, get_events, get_flights, get_weather
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -21,6 +21,8 @@ def destination_details(request, destination_id):
             },
             'restaurants': get_restaurants(destination.latitude, destination.longitude),
             'events': get_events(destination.city),
+            'weather': get_weather(destination.latitude, destination.longitude),
+            'flights': get_flights('ORD', 'NRT'),
         }
         
         return Response(data)
