@@ -1,11 +1,18 @@
 import React from "react";
 
+import {
+  Bookmark,
+  BookmarkCheck,
+} from "lucide-react";
+
 function DestinationCard({
   destination,
   restaurants = [],
   events = [],
   weather = {},
   flights = [],
+  savedItems = [],
+  toggleSaveItem,
 }) {
   return (
     <div className="results-layout">
@@ -59,59 +66,97 @@ function DestinationCard({
 
         {restaurants.length > 0 ? (
           <div className="results-grid">
-            {restaurants.slice(0, 8).map((restaurant) => (
-              <article
-                key={restaurant.id}
-                className="result-card"
-              >
-                <img
-                  src={restaurant.image_url}
-                  alt={restaurant.name}
-                  className="result-image"
-                />
 
-                <div className="result-content">
-                  <h3>{restaurant.name}</h3>
+            {restaurants.slice(0, 8).map((restaurant) => {
 
-                  <div className="result-meta">
-                    <span>⭐ {restaurant.rating}</span>
+              const isSaved = savedItems.some(
+                (item) => item.id === restaurant.id
+              );
 
-                    {restaurant.price && (
-                      <span>{restaurant.price}</span>
-                    )}
-                  </div>
+              return (
+                <article
+                  key={restaurant.id}
+                  className="result-card"
+                >
+                  <img
+                    src={restaurant.image_url}
+                    alt={restaurant.name}
+                    className="result-image"
+                  />
 
-                  <p className="result-address">
-                    {
-                      restaurant.location
-                        ?.display_address?.join(", ")
-                    }
-                  </p>
+                  <div className="result-content">
 
-                  <div className="result-tags">
-                    {restaurant.categories
-                      ?.slice(0, 3)
-                      .map((cat) => (
-                        <span
-                          key={cat.alias}
-                          className="tag"
-                        >
-                          {cat.title}
+                    <div className="card-top-row">
+                      <h3>{restaurant.name}</h3>
+
+                      <button
+                        className="save-btn"
+                        onClick={() =>
+                          toggleSaveItem({
+                            id: restaurant.id,
+                            type: "restaurant",
+                            name: restaurant.name,
+                            image: restaurant.image_url,
+                            address:
+                              restaurant.location?.display_address?.join(", "),
+                            url: restaurant.url,
+                          })
+                        }
+                      >
+                        {isSaved ? (
+                          <BookmarkCheck size={20} />
+                        ) : (
+                          <Bookmark size={20} />
+                        )}
+                      </button>
+                    </div>
+
+                    <div className="result-meta">
+                      <span>
+                        ⭐ {restaurant.rating}
+                      </span>
+
+                      {restaurant.price && (
+                        <span>
+                          {restaurant.price}
                         </span>
-                      ))}
-                  </div>
+                      )}
+                    </div>
 
-                  <a
-                    href={restaurant.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="result-link"
-                  >
-                    View on Yelp
-                  </a>
-                </div>
-              </article>
-            ))}
+                    <p className="result-address">
+                      {
+                        restaurant.location
+                          ?.display_address?.join(", ")
+                      }
+                    </p>
+
+                    <div className="result-tags">
+                      {restaurant.categories
+                        ?.slice(0, 3)
+                        .map((cat) => (
+                          <span
+                            key={cat.alias}
+                            className="tag"
+                          >
+                            {cat.title}
+                          </span>
+                        ))}
+                    </div>
+
+                    <a
+                      href={restaurant.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="result-link"
+                    >
+                      View on Yelp
+                    </a>
+
+                  </div>
+                </article>
+              );
+            })}
+
           </div>
         ) : (
           <p>No restaurants found.</p>
@@ -126,7 +171,9 @@ function DestinationCard({
 
         {events.length > 0 ? (
           <div className="results-grid">
+
             {events.slice(0, 8).map((event) => {
+
               const image =
                 event.images?.find(
                   (img) => img.ratio === "16_9"
@@ -142,6 +189,10 @@ function DestinationCard({
                 event.dates?.start?.localDate ||
                 "Date TBA";
 
+              const isSaved = savedItems.some(
+                (item) => item.id === event.id
+              );
+
               return (
                 <article
                   key={event.id}
@@ -154,7 +205,31 @@ function DestinationCard({
                   />
 
                   <div className="result-content">
-                    <h3>{event.name}</h3>
+
+                    <div className="card-top-row">
+                      <h3>{event.name}</h3>
+
+                      <button
+                        className="save-btn"
+                        onClick={() =>
+                          toggleSaveItem({
+                            id: event.id,
+                            type: "event",
+                            name: event.name,
+                            image,
+                            venue,
+                            date,
+                            url: event.url,
+                          })
+                        }
+                      >
+                        {isSaved ? (
+                          <BookmarkCheck size={20} />
+                        ) : (
+                          <Bookmark size={20} />
+                        )}
+                      </button>
+                    </div>
 
                     <p className="result-date">
                       {date}
@@ -172,10 +247,12 @@ function DestinationCard({
                     >
                       View Event
                     </a>
+
                   </div>
                 </article>
               );
             })}
+
           </div>
         ) : (
           <p>No events found.</p>
@@ -196,8 +273,10 @@ function DestinationCard({
                 className="result-card"
               >
                 <div className="result-content">
+
                   <h3>
-                    {flight.airline?.name || "Unknown Airline"}
+                    {flight.airline?.name ||
+                      "Unknown Airline"}
                   </h3>
 
                   <p className="result-address">
@@ -209,7 +288,8 @@ function DestinationCard({
                   <p className="result-date">
                     Status:
                     {" "}
-                    {flight.flight_status || "Unknown"}
+                    {flight.flight_status ||
+                      "Unknown"}
                   </p>
 
                   <a
@@ -220,6 +300,7 @@ function DestinationCard({
                   >
                     Search Flights
                   </a>
+
                 </div>
               </article>
             ))}
@@ -228,6 +309,7 @@ function DestinationCard({
           <p>No flights found.</p>
         )}
       </section>
+
     </div>
   );
 }

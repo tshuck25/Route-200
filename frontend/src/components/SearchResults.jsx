@@ -28,6 +28,8 @@ const airportMap = {
 function SearchResults({
   searchQuery,
   token,
+  savedItems,
+  toggleSaveItem,
 }) {
   const [data, setData] =
     useState(null);
@@ -202,6 +204,8 @@ function SearchResults({
         events={data.events || []}
         weather={data.weather || {}}
         flights={data.flights || []}
+        savedItems={savedItems}
+        toggleSaveItem={toggleSaveItem}
       />
     </>
   );

@@ -45,6 +45,32 @@ function App() {
     amount: "",
   });
 
+  const [savedItems, setSavedItems] = useState(() => {
+    const stored = localStorage.getItem("savedItems");
+    return stored ? JSON.parse(stored) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem(
+      "savedItems",
+      JSON.stringify(savedItems)
+    );
+  }, [savedItems]);
+
+  const toggleSaveItem = (item) => {
+    const exists = savedItems.find(
+      (saved) => saved.id === item.id
+    );
+
+    if (exists) {
+      setSavedItems((prev) =>
+        prev.filter((saved) => saved.id !== item.id)
+      );
+    } else {
+      setSavedItems((prev) => [...prev, item]);
+    }
+  };
+
   // ---------------- AUTH ----------------
 
   const handleSubmit = async (e) => {
@@ -311,7 +337,7 @@ function App() {
   // ---------------- SIGN OUT ----------------
 
   const handleSignOut = () => {
-    localStorage.clear();
+    localStorage.removeItem("access_token");
 
     setToken(null);
     setTrips([]);
@@ -531,7 +557,55 @@ function App() {
               token={token}
               origin={origin}
               destinationAirport={destinationAirport}
+              savedItems={savedItems}
+              toggleSaveItem={toggleSaveItem}
             />
+          </section>
+        )}
+
+        {view === "saved" && (
+          <section>
+            <h2>Saved Items</h2>
+
+            <div className="results-grid">
+              {savedItems.map((item) => (
+                <article
+                  key={item.id}
+                  className="result-card"
+                >
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="result-image"
+                  />
+
+                  <div className="result-content">
+                    <h3>{item.name}</h3>
+
+                    {item.address && (
+                      <p>{item.address}</p>
+                    )}
+
+                    {item.venue && (
+                      <p>{item.venue}</p>
+                    )}
+
+                    {item.date && (
+                      <p>{item.date}</p>
+                    )}
+
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="result-link"
+                    >
+                      Open
+                    </a>
+                  </div>
+                </article>
+              ))}
+            </div>
           </section>
         )}
 
