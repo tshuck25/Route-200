@@ -2,4 +2,4 @@
 
 echo 'good-bye!'
 
-docker-compose down
+docker compose down
