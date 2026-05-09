@@ -547,10 +547,11 @@ function App() {
           <section>
             <button
               onClick={() => setView("home")}
-              className="text-button"
+              className="home-text-button"
             >
               ← Back to Dashboard
             </button>
+            
 
             <SearchResults
               searchQuery={searchQuery}

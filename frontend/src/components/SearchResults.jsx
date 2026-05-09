@@ -183,7 +183,7 @@ function SearchResults({
 
         <div className="flight-toolbar-group">
           <label>
-            Destination Airport
+            Nearest Destination Airport
           </label>
 
           <div className="airport-display">
