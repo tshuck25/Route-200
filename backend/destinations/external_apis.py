@@ -1,42 +1,29 @@
 import requests
 import os
 
-YELP_API_KEY = os.getenv("YELP_API_KEY")
-TICKETMASTER_API_KEY = os.getenv("TICKETMASTER_API_KEY")
-AVIATIONSTACK_API_KEY = os.getenv("AVIATIONSTACK_API_KEY")
+YELP_API_KEY = os.getenv('YELP_API_KEY')
+TICKETMASTER_API_KEY = os.getenv('TICKETMASTER_API_KEY')
+AVIATIONSTACK_API_KEY = os.getenv('AVIATIONSTACK_API_KEY')
+OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
 
 
-# ---------------- YELP RESTAURANTS ----------------
 
-def get_restaurants_by_city(city, limit=10):
+def get_restaurants(lat, lng, limit=10):
+    """Fetch restaurants from Yelp"""
     url = "https://api.yelp.com/v3/businesses/search"
-
-    headers = {
-        "Authorization": f"Bearer {YELP_API_KEY}"
-    }
-
+    headers = {"Authorization": f"Bearer {YELP_API_KEY}"}
     params = {
-        "term": "restaurants",
-        "location": city,
+        "latitude": lat,
+        "longitude": lng,
+        "categories": "restaurants",
         "limit": limit
     }
 
     try:
-        response = requests.get(
-            url,
-            headers=headers,
-            params=params
-        )
-
-        print("========== YELP ==========")
-        print("STATUS:", response.status_code)
-        print("BODY:", response.text[:1000])
-
+        response = requests.get(url, headers=headers, params=params)
+        print(f"Yelp status: {response.status_code}")
         if response.status_code == 200:
-            data = response.json()
-
-            return data.get("businesses", [])
-
+            return response.json().get('businesses', [])
     except Exception as e:
         print("YELP ERROR:", e)
 
@@ -55,15 +42,9 @@ def get_events(city, limit=10):
     }
 
     try:
-        response = requests.get(
-            url,
-            params=params
-        )
-
-        print("========== TICKETMASTER ==========")
-        print("STATUS:", response.status_code)
-        print("BODY:", response.text[:1000])
-
+        response = requests.get(url, params=params)
+        print(f"Ticketmaster status: {response.status_code}")
+        print(f"Ticketmaster response: {response.text[:500]}")
         if response.status_code == 200:
             data = response.json()
 
@@ -135,35 +116,23 @@ def get_flights(origin, destination):
             return response.json().get("data", [])
 
     except Exception as e:
-        print("FLIGHT ERROR:", e)
-
+        print(f"Error fetching flights: {e}")
     return []
 
-# ---------------- WEATHER ----------------
-
-def get_weather(city):
-    url = "https://api.openweathermap.org/data/2.5/weather"
-
+def get_weather(lat,lng):
+    """Fetch weather from OpenWeather"""
+    url= "https://api.openweathermap.org/data/2.5/weather"
     params = {
-        "q": city,
-        "appid": os.getenv("OPENWEATHER_API_KEY"),
-        "units": "imperial"
+        "lat": lat,
+        "lon": lng,
+        "appid": OPENWEATHER_API_KEY,
+        "units": "metric"
     }
 
     try:
-        response = requests.get(
-            url,
-            params=params
-        )
-
-        print("========== WEATHER ==========")
-        print("STATUS:", response.status_code)
-        print("BODY:", response.text[:1000])
-
+        response = requests.get(url, params=params)
         if response.status_code == 200:
             return response.json()
-
     except Exception as e:
-        print("WEATHER ERROR:", e)
-
+        print(f"Error getting weather: {e}")
     return {}
