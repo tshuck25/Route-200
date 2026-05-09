@@ -3,6 +3,7 @@ import React from "react";
 import {
   Bookmark,
   BookmarkCheck,
+  Star,
 } from "lucide-react";
 
 function DestinationCard({
@@ -112,15 +113,22 @@ function DestinationCard({
                     </div>
 
                     <div className="result-meta">
-                      <span>
-                        ⭐ {restaurant.rating}
+                      <span className="rating-pill">
+                        <Star
+                          size={16}
+                          fill="#facc15"
+                          color="#facc15"
+                        />
+
+                        {restaurant.rating}
                       </span>
 
-                      {restaurant.price && (
-                        <span>
+                        {restaurant.price && (
+                        <span className="price-pill">
                           {restaurant.price}
                         </span>
                       )}
+
                     </div>
 
                     <p className="result-address">

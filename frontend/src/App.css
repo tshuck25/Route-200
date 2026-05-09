@@ -965,3 +965,38 @@ input[type="date"].has-value {
 
   background: rgba(37,99,235,0.16);
 }
+
+.rating-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  font-weight: 700;
+}
+
+.price-pill {
+  padding: 4px 10px;
+
+  border-radius: 999px;
+
+  background: rgba(22,163,74,0.12);
+
+  color: #16a34a;
+
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.home-text-button {
+  margin-bottom: 24px;
+}
+
+.home-text-button {
+  margin-top: 16px;
+
+  background: transparent;
+
+  color: var(--primary-light);
+
+  font-weight: 600;
+}

@@ -1,3 +1,3 @@
-docker-compose down
-docker-compose build backend
-docker-compose up -d
+docker compose down
+docker compose build backend
+docker compose up -d
