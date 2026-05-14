@@ -82,7 +82,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/${endpoint}`,
+        `http://3.144.125.30:8000/api/${endpoint}`,
         {
           method: "POST",
           headers: {
